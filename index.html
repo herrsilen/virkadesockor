@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crochet Sock Calculator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .calculator {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 200px 100px;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: normal;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .pattern {
+            display: none;
+        }
+
+        .pattern.visible {
+            display: block;
+        }
+
+        .stats {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Crochet Sock Calculator</h1>
+        
+        <div class="input-group">
+            <label>Stitches per 10 cm:</label>
+            <input type="number" id="stitchGauge" value="22" step="0.5">
+        </div>
+
+        <div class="input-group">
+            <label>Rows per 10 cm:</label>
+            <input type="number" id="rowGauge" value="26" step="0.5">
+        </div>
+
+        <div class="input-group">
+            <label>Foot circumference (cm):</label>
+            <input type="number" id="footCircumference" value="22" step="0.5">
+        </div>
+
+        <div class="input-group">
+            <label>Foot length (cm):</label>
+            <input type="number" id="footLength" value="24" step="0.5">
+        </div>
+
+        <button onclick="calculatePattern()">Calculate pattern</button>
+    </div>
+
+    <div id="pattern" class="pattern">
+    </div>
+
+    <script>
+        function calculatePattern() {
+            const stitchGauge = parseFloat(document.getElementById('stitchGauge').value) / 10;
+            const rowGauge = parseFloat(document.getElementById('rowGauge').value) / 10;
+            const footCircumference = parseFloat(document.getElementById('footCircumference').value);
+            const footLength = parseFloat(document.getElementById('footLength').value);
+
+            // Basic calculations
+            const targetStitches = Math.round(footCircumference * stitchGauge * 0.9);
+            const targetRows = Math.round(footLength * rowGauge);
+
+            // Calculate key numbers for pattern sections
+            const toeIncreasesNeeded = Math.ceil((targetStitches - 14) / 4);
+            const footLength_cm = footLength - 5;
+            const footRows = Math.round(footLength_cm * rowGauge);
+            const heelStitches = Math.round(targetStitches / 2);
+            
+            const pattern = `
+                <div class="stats">
+                    Target stitch count: ${targetStitches} stitches<br>
+                    Target foot length: ${footLength} cm
+                </div>
+
+                <h2>Toe</h2>
+                <p>Round 1: Ch 7. Sc in 2nd ch from hook and next 4 ch. 3 sc in last ch. Working on opposite side of ch, 1 sc in each ch to last. 2 sc last ch. Place markers in 1st, 6th, 8th, 13th sts. (14 sts)</p>
+                <p>Round 2: 2 sc in 1st marked st. Replace marker in 1st sc. 1 sc in each st to next marker. 2 sc in marked st. Replace marker in 2nd sc. Sc next st. 2 sc in marked st. Replace marker in 1st sc. Sc each st to next marker. 2 sc in marked st. Replace marker in 2nd st. Sc last st.</p>
+                <p>Repeat Round 2 until you have ${targetStitches} stitches (approximately ${toeIncreasesNeeded} increase rounds).</p>
+
+                <h2>Foot</h2>
+                <p>Round 1: 1 sc in each st around.</p>
+                <p>Repeat Round 1 for ${footRows} rounds or until piece measures ${footLength_cm} cm from toe.</p>
+                <p>Place markers in sts ${Math.round(targetStitches/4)}, ${Math.round(targetStitches/4) + 2}, ${Math.round(targetStitches * 3/4)}, and ${Math.round(targetStitches * 3/4) + 2}.</p>
+
+                <h2>Heel Gusset</h2>
+                <p>Round 1: Sc to first marker, 2 sc in marked st (replace marker in 1st sc), sc to next marker, 2 sc in marked st (replace marker in 2nd sc), sc to next marker, 2 sc in marked st (replace marker in 1st sc), sc to last marker, 2 sc in marked st (replace marker in 2nd sc), sc to end. (${targetStitches + 4} sts)</p>
+                <p>Rounds 2-3: Sc in each st.</p>
+                <p>Repeat these 3 rounds 6 times total. (${targetStitches + 24} sts)</p>
+
+                <h2>Heel</h2>
+                <p>Round 1: With larger hook, sc in first st. Sc each st to st before next corner. Sc3tog over st before corner, corner st, and first ch. PM in sc3tog. Working in underside of ch, sc each ch to last {${Math.round(targetStitches/3)} sc}. Sc3tog over last ch, corner st, and next st. PM in sc3tog.</p>
+                <p>Round 2: Sc to st before marker, sc2tog over st before marker and marked st. Replace marker in sc2tog. Sc to next marker. Sc2tog over marked st and next st. Replace marker in sc2tog.</p>
+                <p>Repeat Round 2 ${Math.round(targetStitches/6)} more times. (${targetStitches} sts)</p>
+
+                <h2>Upper</h2>
+                <p>Round 1: Sc to first marker, sc in marked st. Ch ${Math.round(targetStitches/3)}. Sc next marked st. Sc to end.</p>
+                <p>Round 2: Sc to ch, sc in each ch, sc to end. (${targetStitches} sts)</p>
+                <p>Round 3: Sc in each st.</p>
+                <p>Repeat Round 3 for desired leg height.</p>
+
+                <h2>Cuff</h2>
+                <p>Row 1: With smaller hook, join yarn to any st at back. Ch ${Math.round(targetStitches/8)}. Slst in 2nd ch from hook and each rem ch. Slst next sc. Turn.</p>
+                <p>Row 2: Slst in BLO each st. Ch 1, turn.</p>
+                <p>Row 3: Slst BLO each st. Slst next sc. Turn.</p>
+                <p>Repeat Rows 2-3 until no sc remain.</p>
+            `;
+
+            const patternDiv = document.getElementById('pattern');
+            patternDiv.innerHTML = pattern;
+            patternDiv.classList.add('visible');
+        }
+    </script>
+</body>
+</html>
